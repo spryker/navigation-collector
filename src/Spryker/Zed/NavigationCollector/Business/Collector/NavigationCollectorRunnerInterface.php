@@ -5,7 +5,7 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace Spryker\Zed\NavigationCollector\Business;
+namespace Spryker\Zed\NavigationCollector\Business\Collector;
 
 use Generated\Shared\Transfer\LocaleTransfer;
 use Orm\Zed\Touch\Persistence\SpyTouchQuery;
@@ -13,19 +13,11 @@ use Spryker\Zed\Collector\Business\Exporter\Reader\ReaderInterface;
 use Spryker\Zed\Collector\Business\Exporter\Writer\TouchUpdaterInterface;
 use Spryker\Zed\Collector\Business\Exporter\Writer\WriterInterface;
 use Spryker\Zed\Collector\Business\Model\BatchResultInterface;
-use Spryker\Zed\Kernel\Business\AbstractFacade;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @method \Spryker\Zed\NavigationCollector\Business\NavigationCollectorBusinessFactory getFactory()
- */
-class NavigationCollectorFacade extends AbstractFacade implements NavigationCollectorFacadeInterface
+interface NavigationCollectorRunnerInterface
 {
     /**
-     * {@inheritDoc}
-     *
-     * @api
-     *
      * @param \Orm\Zed\Touch\Persistence\SpyTouchQuery $baseQuery
      * @param \Generated\Shared\Transfer\LocaleTransfer $localeTransfer
      * @param \Spryker\Zed\Collector\Business\Model\BatchResultInterface $result
@@ -36,7 +28,7 @@ class NavigationCollectorFacade extends AbstractFacade implements NavigationColl
      *
      * @return void
      */
-    public function runStorageNavigationMenuCollector(
+    public function run(
         SpyTouchQuery $baseQuery,
         LocaleTransfer $localeTransfer,
         BatchResultInterface $result,
@@ -44,15 +36,5 @@ class NavigationCollectorFacade extends AbstractFacade implements NavigationColl
         WriterInterface $dataWriter,
         TouchUpdaterInterface $touchUpdater,
         OutputInterface $output
-    ) {
-        $this->getFactory()->createStorageNavigationMenuCollectorRunner()->run(
-            $baseQuery,
-            $localeTransfer,
-            $result,
-            $dataReader,
-            $dataWriter,
-            $touchUpdater,
-            $output
-        );
-    }
+    ): void;
 }

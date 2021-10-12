@@ -5,27 +5,41 @@
  * Use of this software requires acceptance of the Evaluation License Agreement. See LICENSE file.
  */
 
-namespace Spryker\Zed\NavigationCollector\Business;
+namespace Spryker\Zed\NavigationCollector\Business\Collector;
 
 use Generated\Shared\Transfer\LocaleTransfer;
 use Orm\Zed\Touch\Persistence\SpyTouchQuery;
+use Spryker\Zed\Collector\Business\Collector\DatabaseCollectorInterface;
 use Spryker\Zed\Collector\Business\Exporter\Reader\ReaderInterface;
 use Spryker\Zed\Collector\Business\Exporter\Writer\TouchUpdaterInterface;
 use Spryker\Zed\Collector\Business\Exporter\Writer\WriterInterface;
 use Spryker\Zed\Collector\Business\Model\BatchResultInterface;
-use Spryker\Zed\Kernel\Business\AbstractFacade;
+use Spryker\Zed\NavigationCollector\Dependency\Facade\NavigationCollectorToCollectorInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @method \Spryker\Zed\NavigationCollector\Business\NavigationCollectorBusinessFactory getFactory()
- */
-class NavigationCollectorFacade extends AbstractFacade implements NavigationCollectorFacadeInterface
+class NavigationCollectorRunner implements NavigationCollectorRunnerInterface
 {
     /**
-     * {@inheritDoc}
-     *
-     * @api
-     *
+     * @var \Spryker\Zed\Collector\Business\Collector\DatabaseCollectorInterface
+     */
+    protected $collector;
+
+    /**
+     * @var \Spryker\Zed\NavigationCollector\Dependency\Facade\NavigationCollectorToCollectorInterface
+     */
+    protected $collectorFacade;
+
+    /**
+     * @param \Spryker\Zed\Collector\Business\Collector\DatabaseCollectorInterface $collector
+     * @param \Spryker\Zed\NavigationCollector\Dependency\Facade\NavigationCollectorToCollectorInterface $collectorFacade
+     */
+    public function __construct(DatabaseCollectorInterface $collector, NavigationCollectorToCollectorInterface $collectorFacade)
+    {
+        $this->collector = $collector;
+        $this->collectorFacade = $collectorFacade;
+    }
+
+    /**
      * @param \Orm\Zed\Touch\Persistence\SpyTouchQuery $baseQuery
      * @param \Generated\Shared\Transfer\LocaleTransfer $localeTransfer
      * @param \Spryker\Zed\Collector\Business\Model\BatchResultInterface $result
@@ -36,7 +50,7 @@ class NavigationCollectorFacade extends AbstractFacade implements NavigationColl
      *
      * @return void
      */
-    public function runStorageNavigationMenuCollector(
+    public function run(
         SpyTouchQuery $baseQuery,
         LocaleTransfer $localeTransfer,
         BatchResultInterface $result,
@@ -44,8 +58,9 @@ class NavigationCollectorFacade extends AbstractFacade implements NavigationColl
         WriterInterface $dataWriter,
         TouchUpdaterInterface $touchUpdater,
         OutputInterface $output
-    ) {
-        $this->getFactory()->createStorageNavigationMenuCollectorRunner()->run(
+    ): void {
+        $this->collectorFacade->runCollector(
+            $this->collector,
             $baseQuery,
             $localeTransfer,
             $result,
